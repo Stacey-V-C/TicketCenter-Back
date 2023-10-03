@@ -3,19 +3,15 @@ import type { Plugin, ProcessedView, Ticket, View } from "../types";
 import { DAO } from "../db";
 
 import { applyStateToTickets, summarizePlugins } from "../processing";
-import { generateTickets } from "../data";
+import { exampleTeamSettings, exampleUserSettings, generateTickets } from "../data";
 
 
 export class Controller {
   dao = new DAO();
 
-  constructor(cb?: (d: DAO) => void) {
-    this.dao = new DAO(cb);
-  }
-
-  getUserData = async (userId: string): Promise<ProcessedView[]> => {
-    const views = await this.getViews(userId);
-    const tickets = await this.dao.getTickets();
+  getUserData = (userId: string): ProcessedView[] => {
+    const views = this.getViews(userId);
+    const tickets = this.dao.getTickets();
 
     return views.map(v => this.processViewAndTickets(v, tickets));
   }
@@ -26,17 +22,21 @@ export class Controller {
       .filter(({ plugin }) => plugin.isEditable);
     const tickets = applyStateToTickets(summary.latestState, allTickets);
 
-    return { name: view.name, plugins, tickets };
+    return { 
+      name: view.name, 
+      plugins, 
+      tickets, 
+      latestState: summary.latestState };
   }
-  getViews = async (userId: string): Promise<View[]> => {
+  getViews = (userId: string): View[] => {
     const allowEditing = (plugins: Plugin[]) =>
       plugins.map(p => ({ ...p, isEditable: true }));
 
-    const { flags, team, plugins: userPlugins } = await this.dao.getUserSettings(userId,);
-    const teamPlugins = await this.dao.getTeamPlugins(team,);
+    const { flags, team, plugins: userPlugins } = this.dao.getUserSettings(userId);
+    const teamPlugins = this.dao.getTeamPlugins(team,);
 
     if (flags.admin) {
-      const teamMemberViews = await this.getTeamMemberViews(team, teamPlugins);
+      const teamMemberViews = this.getTeamMemberViews(team, teamPlugins);
       const ownPlugins = [...teamPlugins, ...(allowEditing(userPlugins))];
 
       return [
@@ -51,32 +51,40 @@ export class Controller {
     }
   }
 
-  getTeamMemberViews = async (team: 'red' | 'blue', teamPlugins: Plugin[]): Promise<View[]> => {
-    const teamMembers = await this.dao.getTeamMembers(team);
+  getTeamMemberViews = (team: 'red' | 'blue', teamPlugins: Plugin[]): View[] => {
+    const teamMembers = this.dao.getTeamMembers(team);
 
-    return await Promise.all(teamMembers.map(async (user) => {
-      const { plugins: teamMemberPlugins } = await this.dao.getUserSettings(user,);
+    return teamMembers.map((user) => {
+      const { plugins: teamMemberPlugins } = this.dao.getUserSettings(user,);
       const groupedPlugins = [...teamPlugins, ...teamMemberPlugins];
 
       return { name: user, plugins: groupedPlugins };
-    }))
+    })
   }
 
-  refreshTickets = async (): Promise<void> => {
-    await this.dao.saveTickets(generateTickets(),);
+  refreshTickets = () => {
+    this.dao.saveTickets(generateTickets(),);
   }
 
-  setUserPlugins = async (userId: string, plugins: Plugin[],) =>
-    await this.dao.setUserPlugins(userId, plugins);
+  setUserPlugins = (userId: string, plugins: Plugin[],) =>
+    this.dao.setUserPlugins(userId, plugins);
 
-  setTeamPlugins = async (team: 'red' | 'blue', plugins: Plugin[],) =>
-    await this.dao.setTeamPlugins(team, plugins);
+  setTeamPlugins = (team: 'red' | 'blue', plugins: Plugin[],) =>
+    this.dao.setTeamPlugins(team, plugins);
 
-  getUserSettings = async (userId: string,): Promise<{
+  getUserSettings = (userId: string,): {
     flags: { admin: boolean },
     team: 'red' | 'blue',
     plugins: Plugin[],
-  }> => await this.dao.getUserSettings(userId,);
+  } => this.dao.getUserSettings(userId,);
 
+  initializeData = () => {
+    this.dao.initializeData(
+      exampleTeamSettings,
+      exampleUserSettings,
+    )
+
+    this.refreshTickets();
+  }
 }
 
