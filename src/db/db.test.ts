@@ -1,47 +1,58 @@
-// import { getClient } from "../redis";
-// import { Area, PluginType } from "../types"
-// import type { Team, User } from "../types"
+import { DAO } from ".";
+import { Area, PluginType } from "../types"
+import type { Team, User } from "../types"
 
-// let hSet: jest.SpyInstance;
+let dao: DAO;
 
-// const mockTeams = [
-//   {
-//     name: 'red',
-//     plugins: [
-//       { type: PluginType.FILTER_AREA, keptAreas: [Area.BACKEND] },
-//     ]
-//   }
-// ] as Team[];
+const mockTeams = [
+  {
+    name: 'red',
+    plugins: [
+      { type: PluginType.FILTER_AREA, keptAreas: [Area.BACKEND] },
+    ]
+  }
+] as Team[];
 
-// const mockUsers = [
-//   {
-//     userId: 'Ex Red',
-//     team: 'red',
-//     flags: { admin: false },
-//     plugins: [
-//       { type: PluginType.BOLD_TEXT, word: 'urgent' },
-//     ]
-//   },
-//   {
-//     userId: 'Admin Red',
-//     team: 'red',
-//     flags: { admin: true },
-//     plugins: [
-//       { type: PluginType.FILTER_AREA, keptAreas: [Area.INFRA] },
-//     ]
-//   }
-// ] as User[];
+const mockUsers = [
+  {
+    userId: 'Ex Red',
+    team: 'red',
+    flags: { admin: false },
+    plugins: [
+      { type: PluginType.BOLD_TEXT, word: 'urgent' },
+    ]
+  },
+  {
+    userId: 'Admin Red',
+    team: 'red',
+    flags: { admin: true },
+    plugins: [
+      { type: PluginType.FILTER_AREA, keptAreas: [Area.INFRA] },
+    ]
+  }
+] as User[];
 
-// describe("Database tests", () => {
-//   describe("Test initializeData", () => {
-//     it("Should create plugins for team red and/or blue if provided", async () => {
-//       await dao.initializeData(mockTeams, mockUsers);
+describe("Database tests", () => {
+  describe("Test initializeData", () => {
+    beforeEach(() => {
+      dao = new DAO();
+    })
+    it("Should create plugins for team red and/or blue if provided", () => {
+      dao.initializeData(mockTeams, []);
 
-//       expect(hSet).toHaveBeenCalledWith('team:red', 'plugins', JSON.stringify(mockTeams[0].plugins));
+      expect(dao.data.teams.red.plugins).toEqual(mockTeams[0].plugins);
+      expect(dao.data.teams.blue).toBeUndefined();
+      expect(dao.data.users).toEqual({});
+    });
 
-//       expect(hSet).toHaveBeenCalledWith('user:Ex Red', 'team', 'red');
-//       expect(hSet).toHaveBeenCalledWith('user:Ex Red', 'flags', JSON.stringify({ admin: false }));
-//       expect(hSet).toHaveBeenCalledWith('user:Ex Red', 'plugins', JSON.stringify(mockUsers[0].plugins));
-//     })
-//   });
-// });
+    it("Should create settings for users if provided", () => {
+        dao.initializeData([], mockUsers);
+    
+        expect(dao.data.teams).toEqual({});
+        expect(dao.data.users).toEqual({
+            'Ex Red': mockUsers[0],
+            'Admin Red': mockUsers[1],
+        });
+    })
+  });
+});
