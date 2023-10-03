@@ -1,4 +1,4 @@
-import { Area, ContentFields, Plugin, PluginType, initialState } from "../types";
+import { Area, Plugin, PluginType, initialState } from "../types";
 import {
   applyPluginToState,
   applyStateToTickets,
@@ -15,33 +15,16 @@ const filterAreaPlugin: Plugin = {
   keptAreas: [Area.FRONTEND, Area.BACKEND, Area.INFRA],
 };
 
-const removeContentFieldPlugin: Plugin = {
-  type: PluginType.REMOVE_CONTENT_FIELD,
-  removedContentField: ContentFields.customerCommunication,
-};
-
 const mockTickets = [
   {
     id: 0,
     area: Area.FRONTEND,
-    content: {
-      title: 'Frontend ticket',
-      description: 'This is a frontend ticket',
-      history: ['Frontend ticket was created'],
-      adminNotes: ['Frontend ticket admin notes'],
-      customerCommunication: ['Urgent communication'],
-    }
+    content: 'An urgent bug was found on the frontend',
   },
   {
     id: 1,
     area: Area.BACKEND,
-    content: {
-      title: 'Backend ticket',
-      description: 'This is a backend ticket',
-      history: ['Ticket declared urgent'],
-      adminNotes: ['Backend ticket admin notes'],
-      customerCommunication: ['Backend ticket customer communication'],
-    }
+    content: 'Customer noticed some issues that may have been caused by downtime'
   }
 ]
 
@@ -89,36 +72,6 @@ describe("Processing function tests", () => {
       });
     });
 
-    it("Should remove the listed field if plugin type is removeContentField", () => {
-      const state = applyPluginToState(removeContentFieldPlugin, initialState);
-
-      expect(state).toEqual({
-        ...initialState,
-        contentFields: [
-          ContentFields.title,
-          ContentFields.description,
-          ContentFields.history,
-          ContentFields.adminNotes,
-        ],
-      });
-    });
-
-    it("Should not change state when applying a removeContentField plugin for a field that was already removed", () => {
-      const initialStateWithoutCustomerCommunication = {
-        ...initialState,
-        contentFields: [
-          ContentFields.title,
-          ContentFields.description,
-          ContentFields.history,
-          ContentFields.adminNotes,
-        ],
-      };
-
-      const state = applyPluginToState(removeContentFieldPlugin, initialStateWithoutCustomerCommunication);
-
-      expect(state).toEqual(initialStateWithoutCustomerCommunication);
-    });
-
     it("Should add the bold word if plugin type is boldText", () => {
       const state = applyPluginToState(boldTextPlugin, initialState);
 
@@ -156,13 +109,13 @@ describe("Processing function tests", () => {
 
 describe("Test summarizePlugins", () => {
   it("Should return all tickets, all fields, and no bold words if no plugins are provided", () => {
-    const plugins = [];
+    const plugins: Plugin[] = [];
 
     const summary = summarizePlugins(plugins);
 
     expect(summary).toEqual({
       plugins: [],
-      finalState: initialState
+      latestState: initialState
     });
   });
 
@@ -178,7 +131,7 @@ describe("Test summarizePlugins", () => {
           state: initialState,
         }
       ],
-      finalState: {
+      latestState: {
         ...initialState,
         boldWords: [boldTextPlugin.word],
       }
@@ -204,7 +157,7 @@ describe("Test summarizePlugins", () => {
           },
         }
       ],
-      finalState: {
+      latestState: {
         ...initialState,
         areas: [Area.FRONTEND, Area.BACKEND, Area.INFRA],
         boldWords: [boldTextPlugin.word],
@@ -230,30 +183,6 @@ describe("Test summarizePlugins", () => {
       expect(tickets).toEqual([mockTickets[0]]);
     });
 
-    it("Should return tickets without content fields that are no longer in the state", () => {
-      const state = {
-        ...initialState,
-        contentFields: [ContentFields.title],
-      };
-
-      const tickets = applyStateToTickets(state, mockTickets);
-
-      expect(tickets).toEqual([
-        {
-          ...mockTickets[0],
-          content: {
-            title: mockTickets[0].content.title,
-          }
-        },
-        {
-          ...mockTickets[1],
-          content: {
-            title: mockTickets[1].content.title,
-          }
-        }
-      ]);
-    });
-
     it("Should apply bold tags and capitalization to bold words in any content field", () => {
       const state = {
         ...initialState,
@@ -265,18 +194,9 @@ describe("Test summarizePlugins", () => {
       expect(tickets).toEqual([
         {
           ...mockTickets[0],
-          content: {
-            ...mockTickets[0].content,
-            customerCommunication: ['<b>URGENT</b> communication'],
-          }
+          content: 'An <b>urgent</b> bug was found on the frontend'
         },
-        {
-          ...mockTickets[1],
-          content: {
-            ...mockTickets[1].content,
-            history: ['Ticket declared <b>URGENT</b>'],
-          }
-        }
+        mockTickets[1],
       ]);
     });
   });

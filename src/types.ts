@@ -5,29 +5,14 @@ export enum Area {
   INFRA,
 }
 
-export enum ContentFields {
-  'title',
-  'description',
-  'history',
-  'adminNotes',
-  'customerCommunication',
-}
-
 export type Ticket = {
   id: number,
   area: Area,
-  content: {
-    title: string,
-    description: string,
-    history: string[],
-    adminNotes: string[],
-    customerCommunication: string[],
-  }
+  content: string,
 }
 
 export enum PluginType {
   FILTER_AREA,
-  REMOVE_CONTENT_FIELD,
   BOLD_TEXT,
 }
 
@@ -35,22 +20,16 @@ export type Plugin =
   | {
     readonly type: PluginType.FILTER_AREA,
     keptAreas: Area[],
-    editable?: boolean,
-  }
-  | {
-    readonly type: PluginType.REMOVE_CONTENT_FIELD,
-    removedContentField: ContentFields,
-    editable?: boolean,
+    isEditable?: boolean,
   }
   | {
     readonly type: PluginType.BOLD_TEXT,
     word: string,
-    editable?: boolean,
+    isEditable?: boolean,
   }
 
 export type PluginState = {
   areas: Area[],
-  contentFields: ContentFields[],
   boldWords: string[],
 }
 
@@ -69,13 +48,6 @@ export const initialState: PluginState = {
     Area.INFRA,
     Area.DATABASE
   ],
-  contentFields: [
-    ContentFields.title,
-    ContentFields.description,
-    ContentFields.history,
-    ContentFields.adminNotes,
-    ContentFields.customerCommunication,
-  ],
   boldWords: [],
 };
 
@@ -85,4 +57,18 @@ export type ProcessedView = {
   name: string,
   plugins: PluginSummary[],
   tickets: Ticket[],
+}
+
+export type User = {
+  userId: string,
+  team: 'red' | 'blue',
+  flags: { admin: boolean },
+  plugins: Plugin[],
+}
+
+export type UserSettings = Omit<User, 'userId'>;
+
+export type Team = {
+  name: 'red' | 'blue',
+  plugins: Plugin[],
 }
