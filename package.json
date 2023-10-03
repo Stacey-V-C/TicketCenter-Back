@@ -11,11 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/redis-mock": "^0.17.1",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "redis": "^4.6.10",
-    "redis-mock": "^0.56.3"
+    "express": "^4.18.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",
@@ -26,9 +24,8 @@
     "typescript": "^5.2.2"
   },
   "jest": {
-    "ignore": [
-      "dist",
-      "node_modules"
+    "testPathIgnorePatterns": [
+      "dist"
     ],
     "transform": {
       "^.+\\.tsx?$": "ts-jest"

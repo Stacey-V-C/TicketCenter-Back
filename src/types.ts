@@ -43,10 +43,10 @@ export type Summary =
 
 export const initialState: PluginState = {
   areas: [
-    Area.FRONTEND,
     Area.BACKEND,
+    Area.FRONTEND,
+    Area.DATABASE,
     Area.INFRA,
-    Area.DATABASE
   ],
   boldWords: [],
 };
@@ -57,6 +57,7 @@ export type ProcessedView = {
   name: string,
   plugins: PluginSummary[],
   tickets: Ticket[],
+  latestState: PluginState,
 }
 
 export type User = {

@@ -144,14 +144,11 @@ export const generateContent = () => {
 export const generateTickets = () => {
   let tickets: Ticket[] = [];
   for (let i = 0; i < 10; i++) {
-    console.log("I", i)
     const ticket: any = {
       id: i,
       area: Math.floor(Math.random() * 4),
       content: generateContent()
     }
-
-    console.log('')
 
     tickets.push(ticket);
   }

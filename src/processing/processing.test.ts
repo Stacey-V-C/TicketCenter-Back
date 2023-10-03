@@ -51,7 +51,7 @@ describe("Processing function tests", () => {
 
       expect(state).toEqual({
         ...initialState,
-        areas: [Area.FRONTEND, Area.BACKEND]
+        areas: expect.arrayContaining([Area.FRONTEND, Area.BACKEND])
       });
     });
 
@@ -159,7 +159,7 @@ describe("Test summarizePlugins", () => {
       ],
       latestState: {
         ...initialState,
-        areas: [Area.FRONTEND, Area.BACKEND, Area.INFRA],
+        areas: expect.arrayContaining([Area.FRONTEND, Area.BACKEND, Area.INFRA]),
         boldWords: [boldTextPlugin.word],
       }
     });

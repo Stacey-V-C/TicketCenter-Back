@@ -1,46 +1,43 @@
 import express from "express";
-import { DAO } from "./db";
-import { exampleTeamSettings, exampleUserSettings } from "./data";
 const router = express.Router();
 const { Controller } = require("./controller");
 
-const controller = new Controller((d: DAO) => d.initializeData(exampleTeamSettings, exampleUserSettings));
+const controller = new Controller();
 
-controller.refreshTickets();
-
-router.get("/userData", async (req, res) => {
-  const { userId } = req.query;
-  const views = await controller.getUserData(userId);
+router.get("/userData/:userId", (req, res) => {
+  const { userId } = req.params;
+  const views = controller.getUserData(userId);
 
   res.status(200).send({ views });
 })
 
-router.post("/userPlugins", async (req, res) => {
+router.post("/userPlugins", (req, res) => {
   const { userId, plugins } = req.body;
-  await controller.setUserPlugins(userId, plugins);
+  controller.setUserPlugins(userId, plugins);
 
   res.status(200).send({ success: true });
 })
 
-router.post("/teamPlugins", async (req, res) => {
+router.post("/teamPlugins", (req, res) => {
   const { userId, plugins } = req.body;
-  const { flags, team } = await controller.getUserSettings(userId);
+  const { flags, team } = controller.getUserSettings(userId);
 
   if (!flags.admin) {
     res.send({ success: false });
     return;
   } else {
-    await controller.setTeamPlugins(team, plugins,);
+    controller.setTeamPlugins(team, plugins,);
     res.status(200).send({ success: true });
   }
 });
 
-router.post("/tickets", async (_, res) => {
-  await controller.refreshTickets();
+router.post("/tickets", (_, res) => {
+  controller.refreshTickets();
   res.status(200).send({});
 });
 
 router.get("/users", (_, res) => {
+  controller.initializeData();
   res.status(200).send({
     red: ["Admin Red", "Senior Red", "Junior Red"],
     blue: ["Admin Blue", "Senior Blue", "Junior Blue"],

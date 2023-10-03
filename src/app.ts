@@ -1,13 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import router from './router';
+import bodyParser from 'body-parser';
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(cors({
   origin: 'http://localhost:5173'
 }));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json())
 
 app.use((req, _, next) => {
     console.log(`${req.method} ${req.path}`);

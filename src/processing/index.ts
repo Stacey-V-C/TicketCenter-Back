@@ -5,7 +5,7 @@ export const applyPluginToState = (plugin: Plugin, state: PluginState) => {
   switch (plugin.type) {
     case PluginType.FILTER_AREA:
       const areas = state.areas
-        .filter(a => plugin.keptAreas.includes(a));
+        .filter(a => plugin.keptAreas.includes(a) || false);
 
       return { ...state, areas };
     case PluginType.BOLD_TEXT:
