@@ -164,7 +164,8 @@ describe("Controller tests", () => {
       controller.setTeamPlugins(mockTeam, mockPlugins);
 
       expect(setTeamPlugins).toHaveBeenCalledWith(mockTeam, mockPlugins);
-      expect(controller.dao.data.teams.red.plugins).toEqual(mockPlugins);
+      expect(controller.dao.data.teams.red.plugins)
+        .toEqual(mockPlugins.map(p => ({ ...p, isEditable: undefined })));
     })
   })
 })

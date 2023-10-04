@@ -92,18 +92,6 @@ describe("Processing function tests", () => {
         boldWords: [boldTextPlugin.word],
       });
     });
-
-    it("Should not add a different casing of a word which has already been added", () => {
-      const state = applyPluginToState(boldTextPlugin, {
-        ...initialState,
-        boldWords: [boldTextPlugin.word.toUpperCase()],
-      });
-
-      expect(state).toEqual({
-        ...initialState,
-        boldWords: [boldTextPlugin.word.toUpperCase()],
-      });
-    });
   });
 });
 

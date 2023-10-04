@@ -4,6 +4,8 @@ const { Controller } = require("./controller");
 
 const controller = new Controller();
 
+controller.initializeData();
+
 router.get("/userData/:userId", (req, res) => {
   const { userId } = req.params;
   const views = controller.getUserData(userId);
@@ -33,7 +35,6 @@ router.post("/tickets", (_, res) => {
 });
 
 router.get("/users", (_, res) => {
-  controller.initializeData();
   res.status(200).send({
     red: ["Admin Red", "Senior Red", "Junior Red"],
     blue: ["Admin Blue", "Senior Blue", "Junior Blue"],

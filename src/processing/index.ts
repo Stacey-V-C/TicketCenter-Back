@@ -5,15 +5,13 @@ export const applyPluginToState = (plugin: Plugin, state: PluginState) => {
   switch (plugin.type) {
     case PluginType.FILTER_AREA:
       const areas = state.areas
-        .filter(a => plugin.keptAreas.includes(a) || false);
+        .filter(a => plugin.keptAreas.includes(a));
 
       return { ...state, areas };
     case PluginType.BOLD_TEXT:
-      const redundant = state.boldWords
-        .map(w => w.toLowerCase())
-        .includes(plugin.word.toLowerCase());
-
-      const boldWords = redundant ? state.boldWords : [...state.boldWords, plugin.word];
+      const boldWords = state.boldWords.includes(plugin.word) 
+        ? state.boldWords 
+        : [...state.boldWords, plugin.word];
 
       return { ...state, boldWords };
     default:
@@ -21,18 +19,15 @@ export const applyPluginToState = (plugin: Plugin, state: PluginState) => {
   }
 }
 
-export const summarizePlugins = (plugins: Plugin[]) => {
-  const initial: Summary = { plugins: [], latestState: initialState }
-
-  return plugins.reduce((acc, plugin) => {
+export const summarizePlugins = (plugins: Plugin[]) =>
+  plugins.reduce((acc: Summary, plugin) => {
     const newPlugin = { plugin, state: acc.latestState };
 
     return {
       plugins: [...acc.plugins, newPlugin],
       latestState: applyPluginToState(plugin, acc.latestState),
     };
-  }, initial);
-}
+  }, { plugins: [], latestState: initialState });
 
 export const applyStateToTickets = (state: PluginState, tickets: Ticket[]): Ticket[] =>
   tickets

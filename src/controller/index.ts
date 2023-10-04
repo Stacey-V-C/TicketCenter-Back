@@ -9,6 +9,8 @@ import { exampleTeamSettings, exampleUserSettings, generateTickets } from "../da
 export class Controller {
   dao = new DAO();
 
+  // core logic
+
   getUserData = (userId: string): ProcessedView[] => {
     const views = this.getViews(userId);
     const tickets = this.dao.getTickets();
@@ -62,6 +64,8 @@ export class Controller {
       return { name: user, plugins: groupedPlugins };
     })
   }
+
+  // just wrapper functions
 
   refreshTickets = () => {
     this.dao.saveTickets(generateTickets(),);
