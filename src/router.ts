@@ -20,15 +20,11 @@ router.post("/userPlugins", (req, res) => {
 
 router.post("/teamPlugins", (req, res) => {
   const { userId, plugins } = req.body;
-  const { flags, team } = controller.getUserSettings(userId);
+  const { team } = controller.getUserSettings(userId);
 
-  if (!flags.admin) {
-    res.send({ success: false });
-    return;
-  } else {
-    controller.setTeamPlugins(team, plugins,);
-    res.status(200).send({ success: true });
-  }
+  controller.setTeamPlugins(team, plugins,);
+  res.status(200).send({ success: true });
+
 });
 
 router.post("/tickets", (_, res) => {

@@ -135,4 +135,36 @@ describe("Controller tests", () => {
       }]);
     })
   })
+
+  describe("setTeamPlugins", () => {
+    const mockTeam = "red";
+    const mockPlugins: Plugin[] = [
+      {
+        type: PluginType.BOLD_TEXT,
+        word: "urgent",
+        isEditable: true,
+      },
+      {
+        type: PluginType.FILTER_AREA,
+        keptAreas: [Area.BACKEND],
+        isEditable: true,
+      }
+    ]
+
+    it("Should call dao with proper arguments", () => {
+      const setTeamPlugins = jest.spyOn(controller.dao, "setTeamPlugins");
+
+      controller.dao.initializeData([
+        {
+          name: "red",
+          plugins: [],
+        }
+      ], [])
+
+      controller.setTeamPlugins(mockTeam, mockPlugins);
+
+      expect(setTeamPlugins).toHaveBeenCalledWith(mockTeam, mockPlugins);
+      expect(controller.dao.data.teams.red.plugins).toEqual(mockPlugins);
+    })
+  })
 })

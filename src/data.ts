@@ -46,6 +46,10 @@ export const exampleTeamSettings: Team[] = [
         type: PluginType.FILTER_AREA,
         keptAreas: [Area.BACKEND, Area.DATABASE, Area.INFRA],
       },
+      {
+        type: PluginType.BOLD_TEXT,
+        word: 'urgent',
+      }
     ]
   },
   {
@@ -69,7 +73,7 @@ export const exampleUserSettings: User[] = [
     plugins: [
       {
         type: PluginType.BOLD_TEXT,
-        word: 'urgent',
+        word: 'user',
       },
     ]
   },
@@ -99,7 +103,7 @@ export const exampleUserSettings: User[] = [
       },
       {
         type: PluginType.BOLD_TEXT,
-        word: 'urgent',
+        word: 'error',
       },
     ]
   },
@@ -117,7 +121,12 @@ export const exampleUserSettings: User[] = [
     flags: {
       admin: false,
     },
-    plugins: []
+    plugins: [
+      {
+        type: PluginType.FILTER_AREA,
+        keptAreas: [Area.BACKEND, Area.DATABASE],
+      },
+    ]
   },
   {
     userId: 'Senior Blue',

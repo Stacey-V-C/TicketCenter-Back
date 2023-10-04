@@ -38,9 +38,9 @@ export const applyStateToTickets = (state: PluginState, tickets: Ticket[]): Tick
   tickets
     .filter(t => state.areas.includes(t.area))
     .map(t => {
-      for (const word of state.boldWords) {
-        t.content = t.content.replace(word, `<b>${word}</b>`);
-      }
+      const newContext = state.boldWords.reduce((text: string, word: string) => {
+        return text.replace(word, `<b>${word}</b>`);
+      }, t.content)
 
-      return t;
+      return { ...t, content: newContext };
     });

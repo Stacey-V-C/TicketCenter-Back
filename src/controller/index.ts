@@ -18,6 +18,7 @@ export class Controller {
 
   processViewAndTickets = (view: View, allTickets: Ticket[]): ProcessedView => {
     const summary = summarizePlugins(view.plugins);
+
     const plugins = summary.plugins
       .filter(({ plugin }) => plugin.isEditable);
     const tickets = applyStateToTickets(summary.latestState, allTickets);

@@ -6,6 +6,9 @@ type Database = {
   tickets: Ticket[],
 }
 
+const clearEditability = (plugins: Plugin[]) =>
+    plugins.map(p => ({ ...p, isEditable: undefined }));
+
 export class DAO {
   data: Database = {
     teams: {},
@@ -22,7 +25,7 @@ export class DAO {
   setUserPlugins = (userId: string, plugins: Plugin[],) => {
     console.log("HERE", userId, plugins)
     if (this.data.users?.[userId]) {
-      this.data.users[userId].plugins = plugins;
+      this.data.users[userId].plugins = clearEditability(plugins);
     }
   }
 
@@ -33,8 +36,8 @@ export class DAO {
   } => this.data.users[userId];
 
   setTeamPlugins = (team: 'red' | 'blue', plugins: Plugin[],) => {
-    if (!this.data.teams[team]) {
-      this.data.teams[team].plugins = plugins;
+    if (this.data.teams[team]) {
+      this.data.teams[team].plugins = clearEditability(plugins);
     }
   }
 
