@@ -1,6 +1,16 @@
 import { PluginType, initialState } from "../types";
 import type { Plugin, PluginState, Summary, Ticket } from "../types";
 
+export const summarizePlugins = (plugins: Plugin[]) =>
+  plugins.reduce((acc: Summary, plugin) => {
+    const newPlugin = { plugin, state: acc.latestState };
+
+    return {
+      plugins: [...acc.plugins, newPlugin],
+      latestState: applyPluginToState(plugin, acc.latestState),
+    };
+  }, { plugins: [], latestState: initialState });
+
 export const applyPluginToState = (plugin: Plugin, state: PluginState) => {
   switch (plugin.type) {
     case PluginType.FILTER_AREA:
@@ -18,16 +28,6 @@ export const applyPluginToState = (plugin: Plugin, state: PluginState) => {
       return state;
   }
 }
-
-export const summarizePlugins = (plugins: Plugin[]) =>
-  plugins.reduce((acc: Summary, plugin) => {
-    const newPlugin = { plugin, state: acc.latestState };
-
-    return {
-      plugins: [...acc.plugins, newPlugin],
-      latestState: applyPluginToState(plugin, acc.latestState),
-    };
-  }, { plugins: [], latestState: initialState });
 
 export const applyStateToTickets = (state: PluginState, tickets: Ticket[]): Ticket[] =>
   tickets

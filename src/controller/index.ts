@@ -18,26 +18,12 @@ export class Controller {
     return views.map(v => this.processViewAndTickets(v, tickets));
   }
 
-  processViewAndTickets = (view: View, allTickets: Ticket[]): ProcessedView => {
-    const summary = summarizePlugins(view.plugins);
-
-    const plugins = summary.plugins
-      .filter(({ plugin }) => plugin.isEditable);
-    const tickets = applyStateToTickets(summary.latestState, allTickets);
-
-    return {
-      name: view.name,
-      plugins,
-      tickets,
-      latestState: summary.latestState
-    };
-  }
   getViews = (userId: string): View[] => {
     const allowEditing = (plugins: Plugin[]) =>
       plugins.map(p => ({ ...p, isEditable: true }));
 
     const { flags, team, plugins: userPlugins } = this.dao.getUserSettings(userId);
-    const teamPlugins = this.dao.getTeamPlugins(team,);
+    const teamPlugins = this.dao.getTeamPlugins(team);
 
     if (!flags.admin) {
       const plugins = [...teamPlugins, ...(allowEditing(userPlugins))];
@@ -64,6 +50,21 @@ export class Controller {
 
       return { name: user, plugins: groupedPlugins };
     })
+  }
+
+  processViewAndTickets = (view: View, allTickets: Ticket[]): ProcessedView => {
+    const summary = summarizePlugins(view.plugins);
+
+    const plugins = summary.plugins
+      .filter(({ plugin }) => plugin.isEditable);
+    const tickets = applyStateToTickets(summary.latestState, allTickets);
+
+    return {
+      name: view.name,
+      plugins,
+      tickets,
+      latestState: summary.latestState
+    };
   }
 
   // just wrapper functions
