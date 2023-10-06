@@ -187,5 +187,24 @@ describe("Test summarizePlugins", () => {
         mockTickets[1],
       ]);
     });
+
+    it("Should not modify the original content of the ticket objects", () => {
+      const state = {
+        ...initialState,
+        boldWords: [boldTextPlugin.word],
+      };
+
+      const tickets = applyStateToTickets(state, mockTickets);
+
+      expect(tickets).toEqual([
+        {
+          ...mockTickets[0],
+          content: 'An <b>urgent</b> bug was found on the frontend'
+        },
+        mockTickets[1],
+      ]);
+      
+      expect(mockTickets[0].content).toEqual('An urgent bug was found on the frontend');
+    });
   });
 });
