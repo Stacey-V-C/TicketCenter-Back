@@ -25,11 +25,12 @@ export class Controller {
       .filter(({ plugin }) => plugin.isEditable);
     const tickets = applyStateToTickets(summary.latestState, allTickets);
 
-    return { 
-      name: view.name, 
-      plugins, 
-      tickets, 
-      latestState: summary.latestState };
+    return {
+      name: view.name,
+      plugins,
+      tickets,
+      latestState: summary.latestState
+    };
   }
   getViews = (userId: string): View[] => {
     const allowEditing = (plugins: Plugin[]) =>
@@ -38,7 +39,11 @@ export class Controller {
     const { flags, team, plugins: userPlugins } = this.dao.getUserSettings(userId);
     const teamPlugins = this.dao.getTeamPlugins(team,);
 
-    if (flags.admin) {
+    if (!flags.admin) {
+      const plugins = [...teamPlugins, ...(allowEditing(userPlugins))];
+
+      return [{ name: userId, plugins }];
+    } else {
       const teamMemberViews = this.getTeamMemberViews(team, teamPlugins);
       const ownPlugins = [...teamPlugins, ...(allowEditing(userPlugins))];
 
@@ -47,10 +52,6 @@ export class Controller {
         { name: 'Team', plugins: allowEditing(teamPlugins) },
         ...teamMemberViews,
       ];
-    } else {
-      const plugins = [...teamPlugins, ...(allowEditing(userPlugins))];
-
-      return [{ name: userId, plugins }];
     }
   }
 
